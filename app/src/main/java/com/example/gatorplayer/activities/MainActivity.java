@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -60,16 +61,46 @@ public class MainActivity extends AppCompatActivity {
         final List<Song> tempAudioList = new ArrayList<>();
 
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String[] projection = {MediaStore.Audio.AudioColumns.DATA, MediaStore.Audio.AudioColumns.TITLE, MediaStore.Audio.AudioColumns.ALBUM, MediaStore.Audio.ArtistColumns.ARTIST,};
+        //String[] projection = {MediaStore.Audio.AudioColumns.DATA, MediaStore.Audio.AudioColumns.TITLE, MediaStore.Audio.AudioColumns.ALBUM, MediaStore.Audio.ArtistColumns.ARTIST,};
+        String[] projection = new String[] {
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.ARTIST
+        };
         //String[] projection = {MediaStore.Audio.AudioColumns.DATA, MediaStore.Audio.AudioColumns.TITLE, MediaStore.Audio.AudioColumns.ALBUM, MediaStore.Audio.ArtistColumns.ARTIST,};
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
-        Cursor c = context.getContentResolver().query(uri,
+        try(Cursor cursor = getApplicationContext().getContentResolver().query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 projection,
                 null,
-                null, // yourFolderName
-                null);
+                null,
+                null
+        )) {
+            int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+            int nameColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
+            int albumColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
+            int artistColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
 
-        if (c != null) {
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(idColumn);
+                String name = cursor.getString(nameColumn);
+                String album = cursor.getString(albumColumn);
+                String artist = cursor.getString(artistColumn);
+
+                Uri contentUri = ContentUris.withAppendedId(
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id
+                );
+
+                tempAudioList.add(new Song(contentUri.toString(), name, album, artist));
+            }
+        }
+        return tempAudioList;
+        /*if (c != null) {
             while (c.moveToNext()) {
                 Song Song = new Song();
                 String path = c.getString(0);
@@ -90,6 +121,6 @@ public class MainActivity extends AppCompatActivity {
             c.close();
         }
 
-        return tempAudioList;
+        return tempAudioList;*/
     }
 }
