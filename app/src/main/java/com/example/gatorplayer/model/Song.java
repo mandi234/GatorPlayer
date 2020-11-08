@@ -1,49 +1,54 @@
 package com.example.gatorplayer.model;
 
 public class Song {
-        private String songName;
-        private int duration;
-        private String genre;
-        private String artistName;
-        private String producerName;
+    private String aPath;
+    private String aName;
+    private String aAlbum;
+    private String aArtist;
 
-    public String getSongName() {
-        return songName;
+    public Song() {
     }
 
-    public void setSongName(String songName) {
-        this.songName = songName;
+    public Song(String aPath, String aName, String aAlbum, String aArtist) {
+        this.aPath = aPath;
+        this.aName = aName;
+        this.aAlbum = aAlbum;
+        this.aArtist = aArtist;
     }
 
-    public int getDuration() {
-        return duration;
+    public Song(String aName) {
+        this.aName = aName;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
+    public String getaPath() {
+        return aPath;
     }
 
-    public String getGenre() {
-        return genre;
+    public void setaPath(String aPath) {
+        this.aPath = aPath;
     }
 
-    public void setGenre(String genre) {
-        this.genre = genre;
+    public String getaName() {
+        return aName;
     }
 
-    public String getArtistName() {
-        return artistName;
+    public void setaName(String aName) {
+        this.aName = aName;
     }
 
-    public void setArtistName(String artistName) {
-        this.artistName = artistName;
+    public String getaAlbum() {
+        return aAlbum;
     }
 
-    public String getProducerName() {
-        return producerName;
+    public void setaAlbum(String aAlbum) {
+        this.aAlbum = aAlbum;
     }
 
-    public void setProducerName(String producerName) {
-        this.producerName = producerName;
+    public String getaArtist() {
+        return aArtist;
+    }
+
+    public void setaArtist(String aArtist) {
+        this.aArtist = aArtist;
     }
 }
