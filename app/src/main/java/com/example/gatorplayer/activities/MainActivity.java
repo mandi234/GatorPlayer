@@ -1,6 +1,9 @@
 package com.example.gatorplayer.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,33 +13,79 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.gatorplayer.R;
 import com.example.gatorplayer.adapters.SongsAdapter;
 import com.example.gatorplayer.model.Song;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     List<Song> songs;
+    private static final int PERMISSION_REQUEST_CODE = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        checkPerms();
+        Dexter.withContext(this)
+                .withPermissions(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).withListener(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
+                if(multiplePermissionsReport.areAllPermissionsGranted()) {
+                    makeList();
+                }
+                if(multiplePermissionsReport.isAnyPermissionPermanentlyDenied())
+                    Toast.makeText(MainActivity.this, "Odblokuj kurwa!", Toast.LENGTH_LONG).show();
+            }
 
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> list, PermissionToken permissionToken) {
+                permissionToken.continuePermissionRequest();
+            }
+        }).onSameThread()
+                .check();
+
+        //permission
+        /*if (Build.VERSION.SDK_INT >= 23)
+        {
+            if (checkPermission())
+            {
+                RecyclerView rvSongs = findViewById(R.id.rvSongs);
+
+                makeList();
+            } else {
+                Toast.makeText(MainActivity.this, "tutaj", Toast.LENGTH_LONG).show();
+                requestPermission(); // Code for permission
+            }
+        }
+        else
+        {
+            makeList();
+        }*/
+    }
+
+    private void makeList() {
         RecyclerView rvSongs = findViewById(R.id.rvSongs);
 
-        //songs = Arrays.asList(new Song("chuj"), new Song("kutas"), new Song("chuj"), new Song("kutas"), new Song("chuj"), new Song("kutas"), new Song("chuj"), new Song("kutas"));
+        //test();
         songs = getAllSongs(this);
         SongsAdapter adapter = new SongsAdapter(songs);
 
@@ -45,17 +94,50 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void checkPerms() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-
-                return;
-            }
+    private void requestPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            Toast.makeText(MainActivity.this, "Read External Storage permission allows us to do store images. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
         }
     }
+
+    private boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (result == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.e("value", "Permission Granted, Now you can use local drive .");
+                } else {
+                    Log.e("value", "Permission Denied, You cannot use local drive .");
+                }
+                break;
+        }
+    }
+
+    private void test() {
+        String path = getApplication().getExternalMediaDirs().toString();
+        Log.d("Files", "Path: " + path);
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+            Log.d("Files", "Size: "+ files.length);
+            for (int i = 0; i < files.length; i++)
+            {
+                Log.d("Files", "FileName:" + files[i].getName());
+            }
+
+    }
+
+
 
     private List<Song> getAllSongs(final Context context) {
         final List<Song> tempAudioList = new ArrayList<>();
@@ -72,9 +154,9 @@ public class MainActivity extends AppCompatActivity {
         //String[] projection = {MediaStore.Audio.AudioColumns.DATA, MediaStore.Audio.AudioColumns.TITLE, MediaStore.Audio.AudioColumns.ALBUM, MediaStore.Audio.ArtistColumns.ARTIST,};
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         try(Cursor cursor = getApplicationContext().getContentResolver().query(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                uri,
                 projection,
-                null,
+                selection,
                 null,
                 null
         )) {
@@ -93,34 +175,12 @@ public class MainActivity extends AppCompatActivity {
                 String artist = cursor.getString(artistColumn);
 
                 Uri contentUri = ContentUris.withAppendedId(
-                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id
+                        uri, id
                 );
 
                 tempAudioList.add(new Song(contentUri.toString(), name, album, artist));
             }
         }
         return tempAudioList;
-        /*if (c != null) {
-            while (c.moveToNext()) {
-                Song Song = new Song();
-                String path = c.getString(0);
-                String name = c.getString(1);
-                String album = c.getString(2);
-                String artist = c.getString(3);
-
-                Song.setaName(name);
-                Song.setaAlbum(album);
-                Song.setaArtist(artist);
-                Song.setaPath(path);
-
-                Log.e("Name :" + name, " Album :" + album);
-                Log.e("Path :" + path, " Artist :" + artist);
-
-                tempAudioList.add(Song);
-            }
-            c.close();
-        }
-
-        return tempAudioList;*/
     }
 }
