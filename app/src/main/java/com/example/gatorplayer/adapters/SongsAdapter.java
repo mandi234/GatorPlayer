@@ -1,12 +1,15 @@
 package com.example.gatorplayer.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.gatorplayer.R;
+import com.example.gatorplayer.activities.MainActivity;
 import com.example.gatorplayer.model.Song;
 
 import java.util.ArrayList;
@@ -19,18 +22,21 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
 
     private final List<Song> mSongs;
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView songName;
-        private TextView songPath;
         private TextView songAlbum;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             songName = itemView.findViewById(R.id.song_name);
-            songPath= itemView.findViewById(R.id.song_path);
             songAlbum = itemView.findViewById(R.id.song_album);
+        }
+
+        @Override
+        public void onClick(View view) {
+
         }
     }
 
@@ -51,17 +57,23 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Song song = mSongs.get(position);
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        final Song song = mSongs.get(position);
 
         TextView songNameTextView = holder.songName;
         songNameTextView.setText(song.getaName());
 
-        TextView songPathTextView = holder.songPath;
-        songPathTextView.setText(song.getaPath());
 
         TextView songAlbumTextView = holder.songAlbum;
         songAlbumTextView.setText(song.getaAlbum());
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(view.getContext(), "Jak nie jak tak!" + song.getaName(), Toast.LENGTH_LONG).show();
+                Log.e("tag", "Weszo!");
+            }
+        });
 
     }
 
