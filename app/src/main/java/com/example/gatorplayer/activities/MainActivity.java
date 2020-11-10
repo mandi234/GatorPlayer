@@ -1,6 +1,7 @@
 package com.example.gatorplayer.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -36,12 +37,15 @@ public class MainActivity extends AppCompatActivity {
 
     List<Song> songs;
     private BottomAppBar bottomAppBar;
+    private ActionBar supportActionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        supportActionBar = getSupportActionBar();
+        supportActionBar.hide();
         bottomAppBar = findViewById(R.id.bottomAppBar);
         bottomAppBar.setHideOnScroll(true);
 

@@ -277,19 +277,18 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 
-    <color name="colorPrimary">@color/orange_500</color>
-    <color name="colorPrimaryVariant">@color/orange_200</color>
-    <color name="colorSecondary">@color/light_green_500</color>
-    <color name="colorSecondaryVariant">@color/light_green_200</color>
-    <color name="colorBackground">#008577</color>
-    <color name="colorSurface">#008577</color>
-    <color name="colorError">#008577</color>
-    <color name="colorOnPrimary">#008577</color>
-    <color name="colorOnSecondary">#008577</color>
-    <color name="colorOnBackground">#008577</color>
-    <color name="colorOnSurface">#008577</color>
-    <color name="colorOnError">#008577</color>
-
-    <color name="colorPrimaryDark">@color/orange_700</color>
+    <color name="colorPrimary">#212121</color>
+    <color name="colorPrimaryVariant">#000000</color>
+    <color name="colorSecondary">#76ff03</color>
+    <color name="colorSecondaryVariant">#32cb00</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorError">#B00020</color>
+    <color name="colorOnPrimary">@color/white</color>
+    <color name="colorOnSecondary">@color/black</color>
+    <color name="colorOnBackground">@color/black</color>
+    <color name="colorOnSurface">@color/black</color>
+    <color name="colorOnError">@color/white</color>
+    <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">@color/blue_100</color>
 </resources>
