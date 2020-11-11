@@ -2,24 +2,26 @@ package com.example.gatorplayer.model;
 
 import android.net.Uri;
 
-public class Song {
+import java.util.Observable;
+
+public class CurrentSongSingleton extends Observable {
+    private static final CurrentSongSingleton ourInstance = new CurrentSongSingleton();
+
     private Uri aPath;
     private String aName;
     private String aAlbum;
     private String aArtist;
 
-    public Song() {
+    public static CurrentSongSingleton getInstance() {
+        return ourInstance;
     }
 
-    public Song(Uri aPath, String aName, String aAlbum, String aArtist) {
-        this.aPath = aPath;
-        this.aName = aName;
-        this.aAlbum = aAlbum;
-        this.aArtist = aArtist;
+    private CurrentSongSingleton() {
+        aPath = Uri.EMPTY;
     }
 
-    public Song(String aName) {
-        this.aName = aName;
+    public static CurrentSongSingleton getOurInstance() {
+        return ourInstance;
     }
 
     public Uri getaPath() {
@@ -27,7 +29,11 @@ public class Song {
     }
 
     public void setaPath(Uri aPath) {
-        this.aPath = aPath;
+        if(!this.aPath.equals(aPath)) {
+            this.aPath = aPath;
+
+            setChanged();
+        }
     }
 
     public String getaName() {
